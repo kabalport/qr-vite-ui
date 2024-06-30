@@ -1,6 +1,7 @@
+import React from 'react';
 import QrReader from 'react-qr-scanner';
 
-const QRCodeScanner = ({ onScan }) => {
+const QRCodeScanner = ({ onScan = () => {} }) => {
     const handleScan = (data) => {
         if (data) {
             onScan(data.text);

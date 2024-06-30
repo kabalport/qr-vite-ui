@@ -6,12 +6,17 @@ import { loginUser } from '../features/user/userSlice';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        await dispatch(loginUser({ username, password }));
-        navigate('/dashboard');
+        const success = await dispatch(loginUser({ username, password }));
+        if (success) {
+            navigate('/dashboard');
+        } else {
+            setError('Invalid username or password');
+        }
     };
 
     return (
@@ -30,6 +35,7 @@ const Login = () => {
                 placeholder="Enter password"
             />
             <button onClick={handleLogin}>Login</button>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
 };

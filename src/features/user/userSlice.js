@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
+//import { decodeJWT } from '../utils/decodeJWT'; // decodeJWT 함수 가져오기
+import { decodeJWT } from '../../utils/decodeJWT.js'; // decodeJWT 함수 가져오기
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -16,10 +18,22 @@ export const userSlice = createSlice({
             state.value = null;
             Cookies.remove('token'); // 쿠키에서 토큰 제거
         },
+        initializeUser: (state) => {
+            const token = Cookies.get('token');
+            if (token) {
+                try {
+                    const decodedToken = decodeJWT(token); // decodeJWT 함수 사용
+                    state.value = decodedToken.username;
+                } catch (error) {
+                    state.value = null;
+                    Cookies.remove('token');
+                }
+            }
+        },
     },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, initializeUser } = userSlice.actions;
 
 export const loginUser = ({ username, password }) => async (dispatch) => {
     try {
@@ -34,13 +48,16 @@ export const loginUser = ({ username, password }) => async (dispatch) => {
         const data = await response.json();
 
         if (response.ok) {
-            Cookies.set('token', data.token); // 쿠키에 토큰 저장
+            Cookies.set('token', data.accessToken); // 쿠키에 accessToken 저장
             dispatch(setUser(username));
+            return true;
         } else {
             console.error('Login failed:', data.message);
+            return false;
         }
     } catch (error) {
         console.error('Login error:', error);
+        return false;
     }
 };
 
