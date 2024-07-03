@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import Cookies from 'js-cookie';
-//import { decodeJWT } from '../utils/decodeJWT'; // decodeJWT 함수 가져오기
 import { decodeJWT } from '../../utils/decodeJWT.js'; // decodeJWT 함수 가져오기
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -37,7 +36,7 @@ export const { setUser, logout, initializeUser } = userSlice.actions;
 
 export const loginUser = ({ username, password }) => async (dispatch) => {
     try {
-        const response = await fetch(`${apiUrl}/api/login`, {
+        const response = await fetch(`${apiUrl}/api/member/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,7 +62,7 @@ export const loginUser = ({ username, password }) => async (dispatch) => {
 
 export const registerUser = ({ email, pw, nickname }) => async (dispatch) => {
     try {
-        const response = await fetch(`${apiUrl}/api/join`, {
+        const response = await fetch(`${apiUrl}/api/member/join`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -97,10 +96,10 @@ const fetchWithAuth = async (url, options = {}) => {
 
 export const fetchUserData = () => async (dispatch) => {
     try {
-        const response = await fetchWithAuth('/api/user');
+        const response = await fetchWithAuth('/api/member/me'); // 사용자 데이터를 가져오는 엔드포인트 수정
         const data = await response.json();
         if (response.ok) {
-            dispatch(setUser(data.username));
+            dispatch(setUser(data.nickname)); // 사용자 닉네임 설정
         } else {
             console.error('Fetch user data failed:', data.message);
         }

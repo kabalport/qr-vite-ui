@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { decodeJWT } from '../utils/decodeJWT.js'; // decodeJWT 함수 가져오기
 import QRCodeGenerator from '../components/QRCodeGenerator';
-import QRCodeScanner from '../components/QRCodeScanner';
 import { logout, fetchUserData } from '../features/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,14 +14,26 @@ const Dashboard = () => {
     useEffect(() => {
         const token = Cookies.get('token');
         if (token) {
-            const decodedToken = decodeJWT(token); // decodeJWT 함수 사용
-            dispatch(fetchUserData());
+            try {
+                const decodedToken = decodeJWT(token); // decodeJWT 함수 사용
+                dispatch(fetchUserData());
+            } catch (error) {
+                console.error("Failed to decode token:", error);
+                dispatch(logout());
+                navigate('/login');
+            }
+        } else {
+            navigate('/login');
         }
-    }, [dispatch]);
+    }, [dispatch, navigate]);
 
     const handleLogout = () => {
         dispatch(logout());
         navigate('/');  // 로그아웃 후 메인 페이지로 리디렉션
+    };
+
+    const handleGoHome = () => {
+        navigate('/');
     };
 
     return (
@@ -32,10 +43,7 @@ const Dashboard = () => {
                 <h3>Your QR Code:</h3>
                 <QRCodeGenerator value={user} />
             </div>
-            <div>
-                <h3>Scan QR Code:</h3>
-                <QRCodeScanner onScan={(result) => console.log(result)} />
-            </div>
+            <button onClick={handleGoHome}>홈으로 가기</button>
             <button onClick={handleLogout}>Logout</button>
         </div>
     );
