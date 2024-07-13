@@ -32,7 +32,7 @@ function App() {
             <Route
                 path="/scan"
                 element={
-                        <QRCodeScanPage />
+                    <QRCodeScanPage />
                 }
             />
         </Routes>
